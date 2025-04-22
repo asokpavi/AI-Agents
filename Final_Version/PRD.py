@@ -36,7 +36,8 @@ Problem Statement: {user_problem}
 
 Key Features: {key_features}
 
-
+Structure it clearly with sections: Overview, Problem, Goals, Features.
+"""
     headers = {
         "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
         "Content-Type": "application/json"
