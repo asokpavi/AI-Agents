@@ -8,6 +8,7 @@ import requests
 from dotenv import load_dotenv
 import pickle
 import logging
+import openrouter
 
 
 
@@ -17,6 +18,7 @@ load_dotenv()
 # Set your OpenRouter API key 
 api_key = st.secrets["OPENROUTER_API_KEY"]
 
+client = openrouter.Client(api_key=api_key)
 
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -34,8 +36,6 @@ Problem Statement: {user_problem}
 
 Key Features: {key_features}
 
-Structure it clearly with sections: Overview, Problem, Goals, Features.
-"""
 
     headers = {
         "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
