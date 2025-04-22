@@ -305,10 +305,10 @@ if st.button("Generate PRD"):
     with st.expander("📄 Product Requirements Document (PRD)"):
         st.markdown(result_state["prd_text"])
 
-    with st.expander("🎨 Designer Agent"):
+    with st.expander("🎨 UX Design Agent"):
         st.markdown(result_state["designer_feedback"])
 
-    with st.expander("🛠 Engineer Agent"):
+    with st.expander("🛠 Architecture Agent"):
         st.markdown(result_state["engineer_feedback"])
 
     with st.expander("📏 Metrics"):
@@ -317,7 +317,7 @@ if st.button("Generate PRD"):
     with st.expander("⚠️ Risks"):
         st.text_area("Potential Risks", value=result_state["risks"], height=200)
 
-    with st.expander("📈 Sythesizer Agent - PRD"):
+    with st.expander("📈 Additional : PRD from multiple synthesized agents"):
         st.markdown(result_state["final_prd"])
 
 
