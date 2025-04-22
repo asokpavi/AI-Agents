@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import pickle
 import logging
 import openrouter
-
+import openai
 
 
 # Load environment variables
@@ -18,7 +18,11 @@ load_dotenv()
 # Set your OpenRouter API key 
 api_key = st.secrets["OPENROUTER_API_KEY"]
 
-client = openrouter.Client(api_key=api_key)
+
+client = openai.OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=api_key
+)
 
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
