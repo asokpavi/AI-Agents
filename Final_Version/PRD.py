@@ -275,7 +275,7 @@ runnable_graph = graph.compile()
 
 #title and description
 
-st.title("📑PRD Mastermind: AI Agent-Driven Requirements & Risk Engine")
+st.title("📑PRD - AI Agent Mastermind")
 
 # Collect user inputs
 product_name = st.text_input("Product Name")
