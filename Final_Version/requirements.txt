@@ -6,3 +6,4 @@ oauth2client
 langchain
 langgraph==0.3.31
 python-dotenv
+openrouter
