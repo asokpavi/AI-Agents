@@ -1,0 +1,9 @@
+streamlit
+openai
+requests
+gspread
+oauth2client
+langchain
+langgraph
+pickle
+python-dotenv
