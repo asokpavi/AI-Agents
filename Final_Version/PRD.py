@@ -311,7 +311,7 @@ if st.button("Generate PRD"):
     with st.expander("🛠 Engineer Agent"):
         st.markdown(result_state["engineer_feedback"])
 
-    with st.expander("Metrics"):
+    with st.expander("📏 Metrics"):
         st.text_area("Suggested Success Metrics", value=result_state["metrics"], height=200)
 
     with st.expander("⚠️ Risks"):
@@ -339,7 +339,7 @@ if os.path.exists("saved_prd_state.pkl"):
         with st.expander("🛠 Engineer Agent"):
             st.markdown(result_state["engineer_feedback"])
 
-        with st.expander("Metrics"):
+        with st.expander("📏Metrics"):
             st.text_area("Suggested Success Metrics", value=result_state["metrics"], height=200)
 
         with st.expander("⚠️ Risks"):
