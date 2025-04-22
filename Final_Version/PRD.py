@@ -74,7 +74,7 @@ def generate_metrics_and_risks(product_name, user_problem, key_features, prd_tex
     prompt = f"""
     You are a senior product strategist. Based on the following PRD details, generate:
 
-    📏 4 success metrics to evaluate the product.
+     4 success metrics to evaluate the product.
     ⚠️ 4 product risks that the team should watch out for.
 
     Product Name: {product_name}
@@ -85,7 +85,7 @@ def generate_metrics_and_risks(product_name, user_problem, key_features, prd_tex
 
     Respond in the following format:
 
-    📏 Success Metrics:
+     Success Metrics:
     - Metric 1
     - Metric 2
     - Metric 3
@@ -306,7 +306,7 @@ if st.button("Generate PRD"):
     with st.expander("🛠 Engineer Agent"):
         st.markdown(result_state["engineer_feedback"])
 
-    with st.expander("📏 Metrics"):
+    with st.expander("Metrics"):
         st.text_area("Suggested Success Metrics", value=result_state["metrics"], height=200)
 
     with st.expander("⚠️ Risks"):
@@ -334,7 +334,7 @@ if os.path.exists("saved_prd_state.pkl"):
         with st.expander("🛠 Engineer Agent"):
             st.markdown(result_state["engineer_feedback"])
 
-        with st.expander("📏 Metrics"):
+        with st.expander("Metrics"):
             st.text_area("Suggested Success Metrics", value=result_state["metrics"], height=200)
 
         with st.expander("⚠️ Risks"):
