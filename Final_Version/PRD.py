@@ -302,7 +302,7 @@ if st.button("Generate PRD"):
         pickle.dump(result_state, f)
 
     # Display the results
-    with st.expander("📄 Product Requirements Document (PRD)"):
+    with st.expander("📄 Product Requirements Document Agent"):
         st.markdown(result_state["prd_text"])
 
     with st.expander("🎨 UX Design Agent"):
@@ -311,13 +311,13 @@ if st.button("Generate PRD"):
     with st.expander("🛠 Architecture Agent"):
         st.markdown(result_state["engineer_feedback"])
 
-    with st.expander("📏 Metrics"):
+    with st.expander("📏 Metrics Agent"):
         st.text_area("Suggested Success Metrics", value=result_state["metrics"], height=200)
 
-    with st.expander("⚠️ Risks"):
+    with st.expander("⚠️ Risks Agent"):
         st.text_area("Potential Risks", value=result_state["risks"], height=200)
 
-    with st.expander("📈 Additional : PRD from multiple synthesized agents"):
+    with st.expander("📈Enhanced PRD : Multi Agent"):
         st.markdown(result_state["final_prd"])
 
 
@@ -330,22 +330,22 @@ if os.path.exists("saved_prd_state.pkl"):
         with open("saved_prd_state.pkl", "rb") as f:
             result_state = pickle.load(f)
 
-        with st.expander("📄 Product Requirements Document (PRD)"):
+        with st.expander("📄 Product Requirements Document Agent"):
             st.markdown(result_state["prd_text"])
 
-        with st.expander("🎨 Designer Agent"):
+        with st.expander("🎨 UX Design Agent"):
             st.markdown(result_state["designer_feedback"])
 
-        with st.expander("🛠 Engineer Agent"):
+        with st.expander("🛠 Architecture Agent"):
             st.markdown(result_state["engineer_feedback"])
 
-        with st.expander("📏Metrics"):
+        with st.expander("📏Metrics Agent"):
             st.text_area("Suggested Success Metrics", value=result_state["metrics"], height=200)
 
-        with st.expander("⚠️ Risks"):
+        with st.expander("⚠️ Risks Agent"):
             st.text_area("Potential Risks", value=result_state["risks"], height=200)
 
-        with st.expander("📈 Improved PRD"):
+        with st.expander("📈 Enhanced PRD : Multi Agent"):
             st.markdown(result_state["final_prd"])
 
 
