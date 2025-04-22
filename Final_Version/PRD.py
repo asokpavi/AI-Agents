@@ -98,6 +98,7 @@ def generate_metrics_and_risks(product_name, user_problem, key_features, prd_tex
     - Risk 4
     """
 
+
     headers = {
         "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
         "Content-Type": "application/json"
