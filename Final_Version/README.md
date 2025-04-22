@@ -1,4 +1,4 @@
-# 🧠 PRD Synthesizer - Multi-Agent Edition
+#  PRD- Multi-Agent Edition
 
 This Streamlit app generates full-fledged Product Requirement Documents (PRDs) using AI agents—Product Manager, Designer, Engineer, and Synthesizer. Built with OpenRouter LLMs and LangGraph, it gives you a real-world view of how autonomous agents can collaborate.
 
