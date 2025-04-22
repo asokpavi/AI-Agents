@@ -15,7 +15,9 @@ import logging
 load_dotenv()
 
 # Set your OpenRouter API key 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+api_key = st.secrets["OPENROUTER_API_KEY"]
+
+
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
@@ -56,16 +58,16 @@ Structure it clearly with sections: Overview, Problem, Goals, Features.
     else:
         return f"LLM Error: {response.status_code} – {response.text}"
 
-# Save PRD to Google Sheets
-def save_prd_to_sheet(product_name, user_problem, key_features, prd_text, metrics, risks):
+# # Save PRD to Google Sheets
+# def save_prd_to_sheet(product_name, user_problem, key_features, prd_text, metrics, risks):
   
-    creds_path = os.getenv("GOOGLE_SHEET_CREDENTIALS")
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(creds_path, scope)
-    client = gspread.authorize(creds)
-    sheet = client.open("PRD_Bot_Log").sheet1
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    sheet.append_row([timestamp, product_name, user_problem, key_features, prd_text, metrics, risks])
+#     creds_path = os.getenv("GOOGLE_SHEET_CREDENTIALS")
+#     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+#     creds = ServiceAccountCredentials.from_json_keyfile_name(creds_path, scope)
+#     client = gspread.authorize(creds)
+#     sheet = client.open("PRD_Bot_Log").sheet1
+#     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     sheet.append_row([timestamp, product_name, user_problem, key_features, prd_text, metrics, risks])
 
 # Code for metrics and risks generation.
 def generate_metrics_and_risks(product_name, user_problem, key_features, prd_text):
