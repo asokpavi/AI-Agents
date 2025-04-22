@@ -6,7 +6,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 import os
 import requests
 from dotenv import load_dotenv
-import openai
 import pickle
 import logging
 
@@ -15,15 +14,9 @@ import logging
 # Load environment variables
 load_dotenv()
 
-# Set your OpenRouter API key (
-openai.api_key = os.getenv("OPENROUTER_API_KEY")  # Or you can directly pass the API key here like: openai.api_key = "your-api-key-here"
-
-# Create the OpenAI client using OpenRouter
-client = openai.OpenAI(
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    base_url="https://openrouter.ai/api/v1"  # Use the OpenRouter API endpoint
-)
-
+# Set your OpenRouter API key 
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
 
