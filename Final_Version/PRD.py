@@ -389,11 +389,15 @@ use_cases = {
 }
 
 
-# Add a selectbox for use cases
-selected_case = st.sidebar.selectbox("🔍 Select a Use Case", use_cases.keys())
+# Add a selectbox for use cases with a placeholder
+selected_case = st.sidebar.selectbox(
+    "🔍 Select a Use Case",
+    options=["Select a Use Case"] + list(use_cases.keys()),  # Add a placeholder option
+    index=0  # Ensure the placeholder is selected by default
+)
 
 # Streamlit session state to update fields dynamically
-if selected_case and selected_case in use_cases and use_cases[selected_case]:
+if selected_case != "Select a Use Case" and selected_case in use_cases:
     st.session_state["product_name"] = use_cases[selected_case]["product_name"]
     st.session_state["user_problem"] = use_cases[selected_case]["user_problem"]
     st.session_state["key_features"] = use_cases[selected_case]["key_features"]
