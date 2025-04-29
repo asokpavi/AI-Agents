@@ -215,16 +215,16 @@ def generate_metrics_and_risks_node(state):
     state.risks = risks
     return state
 
-# Define the synthesize feedback node. It cmbines the PRD, designer feedback, engineer feedback, metrics, and risks into a final PRD.
+#  synthesize feedback node. It cmbines the PRD, designer feedback, engineer feedback, metrics, and risks into a final PRD.
 def synthesize_feedback_node(state):
     prd = state.prd_text
     designer = state.designer_feedback
     engineer = state.engineer_feedback
-    metrics_output = f"Metrics:\n{state.metrics}\n\nRisks:\n{state.risks}"
+    metrics_output = state.metrics + "\n" + state.risks
 
     # Define the synthesize_feedback function
     def synthesize_feedback(prd, designer, engineer, metrics_output):
-        return f"Final PRD:\n\n{prd}\n\nDesigner Feedback:\n{designer}\n\nEngineer Feedback:\n{engineer}\n\nMetrics and Risks:\n{metrics_output}"
+        return prd + "\n\n" + designer + "\n\n" + engineer + "\n\n" + metrics_output
     improved = synthesize_feedback(prd, designer, engineer, metrics_output)
     state.final_prd = improved
     return state
@@ -272,20 +272,36 @@ graph.add_edge("Generate Metrics", "Synthesize Final PRD")
 # Compile the graph
 runnable_graph = graph.compile()
 
+
+
 #title and description
 
 st.title("📑 PRD - Multi-Agent Edition")
 
-# Collect user inputs
-product_name = st.text_input("Product Name")
-user_problem = st.text_area("User Problem")
-key_features = st.text_area("Key Features")
 
+
+#Set up state defaults 
+if "product_name" not in st.session_state:
+    st.session_state["product_name"] = ""
+    st.session_state["user_problem"] = ""
+    st.session_state["key_features"] = ""
+
+
+# Collect user inputs
+product_name = st.text_input("Product Name", value=st.session_state.get("product_name", ""))
+user_problem = st.text_area("User Problem", value=st.session_state.get("user_problem", ""))
+key_features = st.text_area("Key Features", value=st.session_state.get("key_features", ""))
+
+
+
+# Add a horizontal divider to separate the main content from the footer
+st.markdown("---")
+
+# Footer section for "Resume Last Session" and "Skip Designer Feedback"
+st.subheader("Options")
 
 # Define conditional logic
 skip_designer = st.checkbox("Skip Designer Feedback")
-
-
 
 # Generate PRD when button is clicked
 if st.button("Generate PRD"):
@@ -322,6 +338,7 @@ if st.button("Generate PRD"):
 
 
 
+
 # Handle resuming previous sessions
 
 if os.path.exists("saved_prd_state.pkl"):
@@ -348,5 +365,35 @@ if os.path.exists("saved_prd_state.pkl"):
             st.markdown(result_state["final_prd"])
 
 
+# Display use cases
+st.sidebar.title("Sample Use Cases")
+st.sidebar.write("Select an existing use case to auto-fill the form.")
 
+use_cases = {
+    "AI Tutor": {
+        "product_name": "GPT-Powered Tutor",
+        "user_problem": "Students lack personalized, on-demand learning support outside the classroom.",
+        "key_features": "Conversational tutoring, adaptive quizzes, progress dashboards"
+    },
+    "HR Onboarding Assistant": {
+        "product_name": "Smart Onboarding Flow",
+        "user_problem": "New hires face fragmented onboarding with no centralized guide.",
+        "key_features": "Interactive checklists, Slack bot assistant, policy explainer"
+    },
+    "Bug Tracker Agent": {
+        "product_name": "Auto-Triage Agent",
+        "user_problem": "Engineers waste time sorting and tagging bug reports manually.",
+        "key_features": "Bug summarization, priority detection, Jira integration"
+    }
+}
+
+
+# Add a selectbox for use cases
+selected_case = st.sidebar.selectbox("🔍 Select a Use Case", use_cases.keys())
+
+# Streamlit session state to update fields dynamically
+if selected_case and selected_case in use_cases and use_cases[selected_case]:
+    st.session_state["product_name"] = use_cases[selected_case]["product_name"]
+    st.session_state["user_problem"] = use_cases[selected_case]["user_problem"]
+    st.session_state["key_features"] = use_cases[selected_case]["key_features"]
 
