@@ -6,24 +6,25 @@ from oauth2client.service_account import ServiceAccountCredentials
 import os
 import requests
 from dotenv import load_dotenv
-import openai
 import pickle
 import logging
-
+import openrouter
+import openai
 
 
 # Load environment variables
 load_dotenv()
 
-# Set your OpenRouter API key (
-openai.api_key = os.getenv("OPENROUTER_API_KEY")  # Or you can directly pass the API key here like: openai.api_key = "your-api-key-here"
+# Set your OpenRouter API key 
+api_key = st.secrets["OPENROUTER_API_KEY"]
 
-# Create the OpenAI client using OpenRouter
+
 client = openai.OpenAI(
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    base_url="https://openrouter.ai/api/v1"  # Use the OpenRouter API endpoint
+    base_url="https://openrouter.ai/api/v1",
+    api_key=api_key
 )
 
+OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
 
@@ -41,7 +42,6 @@ Key Features: {key_features}
 
 Structure it clearly with sections: Overview, Problem, Goals, Features.
 """
-
     headers = {
         "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
         "Content-Type": "application/json"
@@ -63,23 +63,23 @@ Structure it clearly with sections: Overview, Problem, Goals, Features.
     else:
         return f"LLM Error: {response.status_code} – {response.text}"
 
-# Save PRD to Google Sheets
-def save_prd_to_sheet(product_name, user_problem, key_features, prd_text, metrics, risks):
+# # Save PRD to Google Sheets
+# def save_prd_to_sheet(product_name, user_problem, key_features, prd_text, metrics, risks):
   
-    creds_path = os.getenv("GOOGLE_SHEET_CREDENTIALS")
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(creds_path, scope)
-    client = gspread.authorize(creds)
-    sheet = client.open("PRD_Bot_Log").sheet1
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    sheet.append_row([timestamp, product_name, user_problem, key_features, prd_text, metrics, risks])
+#     creds_path = os.getenv("GOOGLE_SHEET_CREDENTIALS")
+#     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+#     creds = ServiceAccountCredentials.from_json_keyfile_name(creds_path, scope)
+#     client = gspread.authorize(creds)
+#     sheet = client.open("PRD_Bot_Log").sheet1
+#     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     sheet.append_row([timestamp, product_name, user_problem, key_features, prd_text, metrics, risks])
 
 # Code for metrics and risks generation.
 def generate_metrics_and_risks(product_name, user_problem, key_features, prd_text):
     prompt = f"""
     You are a senior product strategist. Based on the following PRD details, generate:
 
-    📏 4 success metrics to evaluate the product.
+     4 success metrics to evaluate the product.
     ⚠️ 4 product risks that the team should watch out for.
 
     Product Name: {product_name}
@@ -90,7 +90,7 @@ def generate_metrics_and_risks(product_name, user_problem, key_features, prd_tex
 
     Respond in the following format:
 
-    📏 Success Metrics:
+     Success Metrics:
     - Metric 1
     - Metric 2
     - Metric 3
@@ -102,6 +102,7 @@ def generate_metrics_and_risks(product_name, user_problem, key_features, prd_tex
     - Risk 3
     - Risk 4
     """
+
 
     headers = {
         "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
@@ -276,7 +277,7 @@ runnable_graph = graph.compile()
 
 #title and description
 
-st.title("📑 PRD - Multi-Agent Edition")
+st.title("📑PRD - AI Agent Mastermind")
 
 
 
@@ -317,22 +318,22 @@ if st.button("Generate PRD"):
         pickle.dump(result_state, f)
 
     # Display the results
-    with st.expander("📄 Product Requirements Document (PRD)"):
+    with st.expander("📄 Product Requirements Document Agent"):
         st.markdown(result_state["prd_text"])
 
-    with st.expander("🎨 Designer Agent"):
+    with st.expander("🎨 UX Design Agent"):
         st.markdown(result_state["designer_feedback"])
 
-    with st.expander("🛠 Engineer Agent"):
+    with st.expander("🛠 Architecture Agent"):
         st.markdown(result_state["engineer_feedback"])
 
-    with st.expander("📏 Metrics"):
+    with st.expander("📏 Metrics Agent"):
         st.text_area("Suggested Success Metrics", value=result_state["metrics"], height=200)
 
-    with st.expander("⚠️ Risks"):
+    with st.expander("⚠️ Risks Agent"):
         st.text_area("Potential Risks", value=result_state["risks"], height=200)
 
-    with st.expander("📈 Sythesizer Agent - PRD"):
+    with st.expander("📈Enhanced PRD : Multi Agent"):
         st.markdown(result_state["final_prd"])
 
 
@@ -346,22 +347,22 @@ if os.path.exists("saved_prd_state.pkl"):
         with open("saved_prd_state.pkl", "rb") as f:
             result_state = pickle.load(f)
 
-        with st.expander("📄 Product Requirements Document (PRD)"):
+        with st.expander("📄 Product Requirements Document Agent"):
             st.markdown(result_state["prd_text"])
 
-        with st.expander("🎨 Designer Agent"):
+        with st.expander("🎨 UX Design Agent"):
             st.markdown(result_state["designer_feedback"])
 
-        with st.expander("🛠 Engineer Agent"):
+        with st.expander("🛠 Architecture Agent"):
             st.markdown(result_state["engineer_feedback"])
 
-        with st.expander("📏 Metrics"):
+        with st.expander("📏Metrics Agent"):
             st.text_area("Suggested Success Metrics", value=result_state["metrics"], height=200)
 
-        with st.expander("⚠️ Risks"):
+        with st.expander("⚠️ Risks Agent"):
             st.text_area("Potential Risks", value=result_state["risks"], height=200)
 
-        with st.expander("📈 Improved PRD"):
+        with st.expander("📈 Enhanced PRD : Multi Agent"):
             st.markdown(result_state["final_prd"])
 
 
