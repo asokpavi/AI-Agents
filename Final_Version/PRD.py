@@ -401,4 +401,3 @@ if selected_case != "Select a Use Case" and selected_case in use_cases:
     st.session_state["product_name"] = use_cases[selected_case]["product_name"]
     st.session_state["user_problem"] = use_cases[selected_case]["user_problem"]
     st.session_state["key_features"] = use_cases[selected_case]["key_features"]
-    st.rerun()
