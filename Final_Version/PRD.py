@@ -74,19 +74,70 @@ Structure it clearly with sections: Overview, Problem, Goals, Features.
 #     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 #     sheet.append_row([timestamp, product_name, user_problem, key_features, prd_text, metrics, risks])
 
-# Code for metrics and risks generation.
-def generate_metrics_and_risks(product_name, user_problem, key_features, prd_text):
+
+# Code for designer feedback generation
+def generate_designer_feedback(prd_text):
     prompt = f"""
-    You are a senior product strategist. Based on the following PRD details, generate:
+You are a senior product designer. Based on this PRD, list 3 top UX requirements, improvments and  3 top design considerations.
 
-     4 success metrics to evaluate the product.
-    ⚠️ 4 product risks that the team should watch out for.
+PRD:
+{prd_text}
+"""
+    try:
+        response = client.chat.completions.create(
+            model="mistralai/mistral-7b-instruct",  # Cheaper, solid LLM
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5,
+            max_tokens=500
+        )
 
-    Product Name: {product_name}
-    User Problem: {user_problem}
-    Key Features: {key_features}
-    PRD Summary:
-    {prd_text}
+        return response.choices[0].message.content.strip()
+
+    except Exception as e:
+        return f"Error generating designer feedback: {str(e)}"
+
+
+# Code for engineer feedback generation
+def generate_engineer_feedback(prd_text):
+    prompt = f"""
+You're a senior software architect. Based on this PRD, do the following:
+
+1. Flag any technical feasibility issues.
+2. Recommend a high-level architecture (backend + frontend + infra).
+3. Estimate implementation effort in dev-weeks.
+
+PRD:
+{prd_text}
+"""
+    try:
+        response = client.chat.completions.create(
+            model="mistralai/mistral-7b-instruct",  # Cheaper, solid LLM
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.5,
+            max_tokens=500
+        )
+
+        return response.choices[0].message.content.strip()
+
+    except Exception as e:
+        return f"Error generating engineer feedback: {str(e)}"
+    
+   
+
+# Code for metrics and risks generation.
+def generate_metrics_and_risks(prd_text, designer_feedback, engineer_feedback):
+    prompt = f"""
+    Given the following Product Requirements Document (PRD), designer feedback, and engineer feedback, generate success metrics and product risks for the product.
+
+    PRD: {prd_text}
+
+    Designer Feedback: {designer_feedback}
+
+    Engineer Feedback: {engineer_feedback}
+
+    Please generate:
+    1. A list of 5 top success metrics that should be tracked to evaluate the product's performance.
+    2. A list of 5 top potential product risks that could affect the product's success.
 
     Respond in the following format:
 
@@ -135,52 +186,6 @@ def generate_metrics_and_risks(product_name, user_problem, key_features, prd_tex
     else:
         return f"LLM Error: {response.status_code} – {response.text}", "Error retrieving risks."
 
-# Code for designer feedback generation
-def generate_designer_feedback(prd_text):
-    prompt = f"""
-You are a senior product designer. Based on this PRD, list 3 UX improvements and 2 design risks.
-
-PRD:
-{prd_text}
-"""
-    try:
-        response = client.chat.completions.create(
-            model="mistralai/mistral-7b-instruct",  # Cheaper, solid LLM
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.5,
-            max_tokens=500
-        )
-
-        return response.choices[0].message.content.strip()
-
-    except Exception as e:
-        return f"Error generating designer feedback: {str(e)}"
-
-
-# Code for engineer feedback generation
-def generate_engineer_feedback(prd_text):
-    prompt = f"""
-You're a senior software architect. Based on this PRD, do the following:
-
-1. Flag any technical feasibility issues.
-2. Recommend a high-level architecture (backend + frontend + infra).
-3. Estimate implementation effort in dev-weeks.
-
-PRD:
-{prd_text}
-"""
-    try:
-        response = client.chat.completions.create(
-            model="mistralai/mistral-7b-instruct",  # Cheaper, solid LLM
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.5,
-            max_tokens=500
-        )
-
-        return response.choices[0].message.content.strip()
-
-    except Exception as e:
-        return f"Error generating engineer feedback: {str(e)}"
 
 
 # Define LangGraph Node Functions. These functions will be called by the LangGraph framework to generate the PRD, designer feedback, engineer feedback, and metrics/risks.
@@ -205,30 +210,34 @@ def generate_engineer_feedback_node(state):
     state.engineer_feedback = feedback
     return state
 
+
 def generate_metrics_and_risks_node(state):
+    """
+    Updated version of the generate_metrics_and_risks_node to include designer and engineer feedback
+    in the generation of success metrics and risks.
+    
+    :param state: The current state of the product and feedback, including PRD text, designer feedback,
+                  engineer feedback, and other relevant information.
+    :return: Updated state with metrics and risks.
+    """
+    # Extracting information from the state
     product_name = state.product_name
     user_problem = state.user_problem
     key_features = state.key_features
     prd_text = state.prd_text
+    designer_feedback = state.designer_feedback  # Added designer feedback
+    engineer_feedback = state.engineer_feedback  # Added engineer feedback
     
-    metrics, risks = generate_metrics_and_risks(product_name, user_problem, key_features, prd_text)
+    # Generate metrics and risks using the new approach
+    metrics, risks = generate_metrics_and_risks(prd_text, designer_feedback, engineer_feedback)
+    
+    # Storing the generated metrics and risks back into the state
     state.metrics = metrics
     state.risks = risks
+    
     return state
 
-#  synthesize feedback node. It cmbines the PRD, designer feedback, engineer feedback, metrics, and risks into a final PRD.
-def synthesize_feedback_node(state):
-    prd = state.prd_text
-    designer = state.designer_feedback
-    engineer = state.engineer_feedback
-    metrics_output = state.metrics + "\n" + state.risks
 
-    # Define the synthesize_feedback function
-    def synthesize_feedback(prd, designer, engineer, metrics_output):
-        return prd + "\n\n" + designer + "\n\n" + engineer + "\n\n" + metrics_output
-    improved = synthesize_feedback(prd, designer, engineer, metrics_output)
-    state.final_prd = improved
-    return state
 
 
 # Define the state schema using a dataclass
@@ -256,7 +265,7 @@ graph.add_node("Generate PRD", generate_prd_node)
 graph.add_node("Generate Designer Feedback", generate_designer_feedback_node)
 graph.add_node("Generate Engineer Feedback", generate_engineer_feedback_node)
 graph.add_node("Generate Metrics", generate_metrics_and_risks_node)
-graph.add_node("Synthesize Final PRD", synthesize_feedback_node)
+
 
 
 # Add edges to the graph
@@ -268,7 +277,7 @@ graph.add_conditional_edges("Generate PRD", route_after_prd)
 
 graph.add_edge("Generate Designer Feedback", "Generate Engineer Feedback")
 graph.add_edge("Generate Engineer Feedback", "Generate Metrics")
-graph.add_edge("Generate Metrics", "Synthesize Final PRD")
+
 
 # Compile the graph
 runnable_graph = graph.compile()
@@ -277,7 +286,7 @@ runnable_graph = graph.compile()
 
 #title and description
 
-st.title("📑PRD - AI Agent Mastermind")
+st.title("📑PRD - AI Agents")
 
 
 
@@ -333,10 +342,7 @@ if st.button("Generate PRD"):
     with st.expander("⚠️ Risks Agent"):
         st.text_area("Potential Risks", value=result_state["risks"], height=200)
 
-    with st.expander("📈Enhanced PRD : Multi Agent"):
-        st.markdown(result_state["final_prd"])
-
-
+   
 
 
 
@@ -347,13 +353,13 @@ if os.path.exists("saved_prd_state.pkl"):
         with open("saved_prd_state.pkl", "rb") as f:
             result_state = pickle.load(f)
 
-        with st.expander("📄 Product Requirements Document Agent"):
+        with st.expander("📄 Product Requirements gent"):
             st.markdown(result_state["prd_text"])
 
-        with st.expander("🎨 UX Design Agent"):
+        with st.expander("🎨 UX Designer Feedback Agent"):
             st.markdown(result_state["designer_feedback"])
 
-        with st.expander("🛠 Architecture Agent"):
+        with st.expander("🛠 Engineering Feedback Agent"):
             st.markdown(result_state["engineer_feedback"])
 
         with st.expander("📏Metrics Agent"):
@@ -362,9 +368,7 @@ if os.path.exists("saved_prd_state.pkl"):
         with st.expander("⚠️ Risks Agent"):
             st.text_area("Potential Risks", value=result_state["risks"], height=200)
 
-        with st.expander("📈 Enhanced PRD : Multi Agent"):
-            st.markdown(result_state["final_prd"])
-
+        
 
 # Display use cases
 st.sidebar.title("Sample Use Cases")
